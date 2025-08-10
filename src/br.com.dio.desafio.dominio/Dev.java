@@ -3,7 +3,8 @@ package br.com.dio.desafio.dominio;
 import java.util.Set;
 import java.util.LinkedHashSet;
 import java.util.Objects;
-
+import java.util.Optional;
+import java.util.stream.*;
 
 public class Dev {
 	private String name;
@@ -11,15 +12,24 @@ public class Dev {
 	private Set<Content> finishedContents = new LinkedHashSet<>();
 	
 	public void enrollBootcamp(Bootcamp bootcamp) {
-		
+		this.enrolledContents.addAll(bootcamp.getContents());
+		bootcamp.getEnrolledDevs().add(this);
 	}
 
 	public void progress() {
-	
+		Optional<Content> content = this.enrolledContents.stream().findFirst();
+		if (content.isPresent()) {
+			this.finishedContents.add(content.get());
+			this.enrolledContents.remove(content.get());
+		} else {
+			System.err.println("You haven't enrolled in any content!");
+		}
 	}
 
-	public void calcXp() {
-
+	public void calcTotalXp() {
+		return this.finishedContents.stream()
+			.mapToDouble(Content::calcXp)
+			.sum();
 	}
 
 	public String getName() {
